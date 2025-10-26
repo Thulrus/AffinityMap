@@ -140,6 +140,8 @@ export default function PersonCard({
         left: `${position.x}px`,
         top: `${position.y}px`,
         touchAction: 'none',
+        userSelect: 'none', // Prevent text selection during drag
+        cursor: isDragging ? 'grabbing' : undefined, // Override cursor when dragging (even over text)
       }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
