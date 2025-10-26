@@ -6,6 +6,7 @@ interface ToolbarProps {
   onAddMultiplePeople: (names: string[]) => void
   onExportData: () => void
   onImportData: (data: ExportData) => void
+  onClearAllData: () => void
   allTags: string[]
   selectedTags: string[]
   onToggleTag: (tag: string) => void
@@ -18,6 +19,7 @@ export default function Toolbar({
   onAddMultiplePeople,
   onExportData,
   onImportData,
+  onClearAllData,
   allTags,
   selectedTags,
   onToggleTag,
@@ -153,6 +155,16 @@ export default function Toolbar({
               className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors"
             >
               Export Project
+            </button>
+            <hr className="my-2 border-gray-600" />
+            <button
+              onClick={() => {
+                onClearAllData()
+                setShowImportMenu(false)
+              }}
+              className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors text-red-400 hover:text-red-300"
+            >
+              Clear All Data
             </button>
           </div>
         )}

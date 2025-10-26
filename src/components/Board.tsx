@@ -11,6 +11,8 @@ interface BoardProps {
   onZoomChange: (zoom: number) => void
   onPositionsUpdate: (positions: CardPosition[]) => void
   initialPositions: CardPosition[]
+  initialPan: Position
+  onPanChange: (pan: Position) => void
 }
 
 interface PersonPosition {
@@ -27,10 +29,12 @@ export default function Board({
   zoom, 
   onZoomChange, 
   onPositionsUpdate,
-  initialPositions 
+  initialPositions,
+  initialPan,
+  onPanChange
 }: BoardProps) {
   const [positions, setPositions] = useState<PersonPosition[]>([])
-  const [pan, setPan] = useState<Position>({ x: 0, y: 0 })
+  const [pan, setPan] = useState<Position>(initialPan)
   const [isPanning, setIsPanning] = useState(false)
   const [startPan, setStartPan] = useState<Position>({ x: 0, y: 0 })
   const [touchStartDistance, setTouchStartDistance] = useState<number | null>(null)
@@ -38,6 +42,12 @@ export default function Board({
   const [touchStartCenter, setTouchStartCenter] = useState<Position | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const isInitializedRef = useRef(false)
+
+  // Helper function to update pan and save to parent
+  const updatePan = (newPan: Position) => {
+    setPan(newPan)
+    onPanChange(newPan)
+  }
 
   // Initialize positions from imported data on first render
   useEffect(() => {
@@ -107,7 +117,7 @@ export default function Board({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isPanning) {
-      setPan({ x: e.clientX - startPan.x, y: e.clientY - startPan.y })
+      updatePan({ x: e.clientX - startPan.x, y: e.clientY - startPan.y })
     }
   }
 
@@ -142,7 +152,7 @@ export default function Board({
     const newPanY = mouseY - (mouseY - pan.y) * scale
 
     onZoomChange(newZoom)
-    setPan({ x: newPanX, y: newPanY })
+    updatePan({ x: newPanX, y: newPanY })
   }
 
   // Get distance between two touch points
@@ -206,14 +216,14 @@ export default function Board({
           const newPanX = centerX - (touchStartCenter.x - pan.x) * zoomScale
           const newPanY = centerY - (touchStartCenter.y - pan.y) * zoomScale
           
-          setPan({ x: newPanX, y: newPanY })
+          updatePan({ x: newPanX, y: newPanY })
         }
       }
       
       onZoomChange(newZoom)
     } else if (e.touches.length === 1 && isPanning) {
       // Single finger pan
-      setPan({ x: e.touches[0].clientX - startPan.x, y: e.touches[0].clientY - startPan.y })
+      updatePan({ x: e.touches[0].clientX - startPan.x, y: e.touches[0].clientY - startPan.y })
     }
   }
 
