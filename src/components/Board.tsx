@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import PersonCard from './PersonCard'
 import { Person, Position, CardPosition } from '../types'
 
@@ -13,6 +13,7 @@ interface BoardProps {
   initialPositions: CardPosition[]
   initialPan: Position
   onPanChange: (pan: Position) => void
+  recenterTrigger?: number
 }
 
 interface PersonPosition {
@@ -31,7 +32,8 @@ export default function Board({
   onPositionsUpdate,
   initialPositions,
   initialPan,
-  onPanChange
+  onPanChange,
+  recenterTrigger
 }: BoardProps) {
   const [positions, setPositions] = useState<PersonPosition[]>([])
   const [pan, setPan] = useState<Position>(initialPan)
@@ -44,11 +46,100 @@ export default function Board({
   const contentRef = useRef<HTMLDivElement>(null)
   const isInitializedRef = useRef(false)
 
-  // Helper function to update pan and save to parent
+  // Helper function to update pan and save to parent with bounds checking
   const updatePan = (newPan: Position) => {
-    setPan(newPan)
-    onPanChange(newPan)
+    const constrainedPan = constrainPan(newPan)
+    setPan(constrainedPan)
+    onPanChange(constrainedPan)
   }
+
+  // Calculate bounds of all card positions
+  const getCardBounds = () => {
+    if (positions.length === 0) return null
+    
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    
+    positions.forEach(pos => {
+      minX = Math.min(minX, pos.position.x)
+      minY = Math.min(minY, pos.position.y)
+      maxX = Math.max(maxX, pos.position.x + 250) // Approximate card width
+      maxY = Math.max(maxY, pos.position.y + 150) // Approximate card height
+    })
+    
+    return { minX, minY, maxX, maxY }
+  }
+
+  // Center view on all cards
+  const recenterView = useCallback(() => {
+    const bounds = getCardBounds()
+    if (!bounds || !boardRef.current) return
+    
+    const rect = boardRef.current.getBoundingClientRect()
+    const centerX = (bounds.minX + bounds.maxX) / 2
+    const centerY = (bounds.minY + bounds.maxY) / 2
+    
+    // Center the cards in the viewport
+    const newPan = {
+      x: rect.width / 2 - centerX * zoom,
+      y: rect.height / 2 - centerY * zoom
+    }
+    
+    updatePan(newPan)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoom, positions])
+
+  // Constrain pan to keep at least one card visible
+  const constrainPan = (newPan: Position): Position => {
+    const bounds = getCardBounds()
+    if (!bounds || !boardRef.current) return newPan
+    
+    const rect = boardRef.current.getBoundingClientRect()
+    
+    // Calculate the bounds of visible area in world coordinates
+    const viewMinX = -newPan.x / zoom
+    const viewMinY = -newPan.y / zoom
+    const viewMaxX = (rect.width - newPan.x) / zoom
+    const viewMaxY = (rect.height - newPan.y) / zoom
+    
+    // Check if any part of the cards is visible
+    const isVisible = !(
+      bounds.maxX < viewMinX || // All cards are left of view
+      bounds.minX > viewMaxX || // All cards are right of view
+      bounds.maxY < viewMinY || // All cards are above view
+      bounds.minY > viewMaxY    // All cards are below view
+    )
+    
+    if (isVisible) return newPan
+    
+    // If not visible, constrain the pan to show at least some cards
+    let constrainedX = newPan.x
+    let constrainedY = newPan.y
+    
+    if (bounds.maxX < viewMinX) {
+      // Cards are too far left, show right edge
+      constrainedX = -bounds.maxX * zoom + rect.width
+    } else if (bounds.minX > viewMaxX) {
+      // Cards are too far right, show left edge
+      constrainedX = -bounds.minX * zoom
+    }
+    
+    if (bounds.maxY < viewMinY) {
+      // Cards are too far up, show bottom edge
+      constrainedY = -bounds.maxY * zoom + rect.height
+    } else if (bounds.minY > viewMaxY) {
+      // Cards are too far down, show top edge
+      constrainedY = -bounds.minY * zoom
+    }
+    
+    return { x: constrainedX, y: constrainedY }
+  }
+
+  // Trigger recenter when recenterTrigger changes
+  useEffect(() => {
+    if (recenterTrigger && recenterTrigger > 0) {
+      recenterView()
+    }
+  }, [recenterTrigger, recenterView])
 
   // Prevent default browser gestures on touch devices
   useEffect(() => {
@@ -131,6 +222,10 @@ export default function Board({
   }, [allPeople])
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Close any open menus in toolbar
+    const closeMenus = (window as unknown as { __affinityMapCloseMenus?: () => void }).__affinityMapCloseMenus
+    if (closeMenus) closeMenus()
+
     const target = e.target as HTMLElement
     // Allow panning on the board container or the content area (but not on cards)
     if (target === boardRef.current || target === contentRef.current || target.tagName === 'svg' || target.tagName === 'rect') {
@@ -198,6 +293,10 @@ export default function Board({
 
   // Handle touch start
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Close any open menus in toolbar
+    const closeMenus = (window as unknown as { __affinityMapCloseMenus?: () => void }).__affinityMapCloseMenus
+    if (closeMenus) closeMenus()
+
     if (e.touches.length === 2) {
       // Prevent default browser pinch-zoom
       e.preventDefault()
@@ -227,30 +326,32 @@ export default function Board({
 
   // Handle touch move
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length === 2 && touchStartDistance) {
+    if (e.touches.length === 2 && touchStartDistance && touchStartCenter) {
       // Pinch zoom
       e.preventDefault()
       const currentDistance = getTouchDistance(e.touches)
       const scale = currentDistance / touchStartDistance
       const newZoom = Math.max(0.25, Math.min(2, touchStartZoom * scale))
       
-      if (touchStartCenter) {
-        const rect = boardRef.current?.getBoundingClientRect()
-        if (rect) {
-          const center = getTouchCenter(e.touches)
-          const centerX = center.x - rect.left
-          const centerY = center.y - rect.top
-          
-          // Adjust pan to keep zoom centered on pinch point
-          const zoomScale = newZoom / zoom
-          const newPanX = centerX - (touchStartCenter.x - pan.x) * zoomScale
-          const newPanY = centerY - (touchStartCenter.y - pan.y) * zoomScale
-          
-          updatePan({ x: newPanX, y: newPanY })
-        }
+      const rect = boardRef.current?.getBoundingClientRect()
+      if (rect) {
+        const currentCenter = getTouchCenter(e.touches)
+        const currentCenterX = currentCenter.x - rect.left
+        const currentCenterY = currentCenter.y - rect.top
+        
+        // Calculate the world position (in content coordinates) that should stay under the pinch center
+        // The formula: world_pos = (screen_pos - pan) / zoom
+        const worldX = (touchStartCenter.x - pan.x) / zoom
+        const worldY = (touchStartCenter.y - pan.y) / zoom
+        
+        // Calculate new pan so this world position appears at the current touch center
+        // Rearranging: pan = screen_pos - (world_pos * new_zoom)
+        const newPanX = currentCenterX - (worldX * newZoom)
+        const newPanY = currentCenterY - (worldY * newZoom)
+        
+        onZoomChange(newZoom)
+        updatePan({ x: newPanX, y: newPanY })
       }
-      
-      onZoomChange(newZoom)
     } else if (e.touches.length === 1 && isPanning) {
       // Single finger pan
       updatePan({ x: e.touches[0].clientX - startPan.x, y: e.touches[0].clientY - startPan.y })

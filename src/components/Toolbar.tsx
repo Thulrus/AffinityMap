@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ExportData } from '../types'
 
 interface ToolbarProps {
@@ -13,6 +13,8 @@ interface ToolbarProps {
   onToggleTag: (tag: string) => void
   zoom: number
   onZoomChange: (zoom: number) => void
+  onRecenter: () => void
+  onBoardClick?: () => void
 }
 
 export default function Toolbar({
@@ -27,12 +29,26 @@ export default function Toolbar({
   onToggleTag,
   zoom,
   onZoomChange,
+  onRecenter,
+  onBoardClick,
 }: ToolbarProps) {
   const [newPersonName, setNewPersonName] = useState('')
   const [showTagFilter, setShowTagFilter] = useState(false)
   const [showImportMenu, setShowImportMenu] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const namesInputRef = useRef<HTMLInputElement>(null)
+
+  const closeMenus = () => {
+    setShowTagFilter(false)
+    setShowImportMenu(false)
+  }
+
+  // Expose closeMenus through the onBoardClick callback
+  useEffect(() => {
+    if (onBoardClick) {
+      (window as unknown as { __affinityMapCloseMenus?: () => void }).__affinityMapCloseMenus = closeMenus
+    }
+  }, [onBoardClick])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -212,6 +228,13 @@ export default function Toolbar({
           className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded"
         >
           +
+        </button>
+        <button
+          onClick={onRecenter}
+          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded ml-2"
+          title="Recenter view on cards"
+        >
+          ⊙
         </button>
       </div>
     </div>

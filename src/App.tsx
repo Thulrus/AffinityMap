@@ -28,6 +28,8 @@ function App() {
     const saved = localStorage.getItem(STORAGE_KEYS.PAN)
     return saved ? JSON.parse(saved) : { x: 0, y: 0 }
   })
+
+  const [recenterTrigger, setRecenterTrigger] = useState(0)
   
   const positionsRef = useRef<CardPosition[]>([])
   
@@ -168,6 +170,8 @@ function App() {
         onToggleTag={handleToggleTag}
         zoom={zoom}
         onZoomChange={setZoom}
+        onRecenter={() => setRecenterTrigger(prev => prev + 1)}
+        onBoardClick={() => {/* Placeholder - actual close handled via window global */}}
       />
       <Board 
         people={filteredPeople}
@@ -180,6 +184,7 @@ function App() {
         initialPositions={positionsRef.current}
         initialPan={pan}
         onPanChange={setPan}
+        recenterTrigger={recenterTrigger}
       />
     </div>
   )
