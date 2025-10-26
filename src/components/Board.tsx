@@ -318,8 +318,13 @@ export default function Board({
       const distance = getTouchDistance(e.touches)
       setTouchStartDistance(distance)
       setTouchStartZoom(zoom)
-      setTouchStartPan(pan) // Store the pan at the start of pinch
       setWasRecentlyPinching(true) // Mark that we're pinching
+      
+      // Get the current pan value (not from closure) and store it
+      setPan(currentPan => {
+        setTouchStartPan(currentPan)
+        return currentPan
+      })
       
       const rect = boardRef.current?.getBoundingClientRect()
       if (rect) {
