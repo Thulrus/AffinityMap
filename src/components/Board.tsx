@@ -44,6 +44,7 @@ export default function Board({
   const [touchStartCenter, setTouchStartCenter] = useState<Position | null>(null)
   const [touchStartPan, setTouchStartPan] = useState<Position | null>(null)
   const [currentGestureZoom, setCurrentGestureZoom] = useState<number | null>(null)
+  const [wasRecentlyPinching, setWasRecentlyPinching] = useState(false)
   const boardRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const isInitializedRef = useRef(false)
@@ -318,6 +319,7 @@ export default function Board({
       setTouchStartDistance(distance)
       setTouchStartZoom(zoom)
       setTouchStartPan(pan) // Store the pan at the start of pinch
+      setWasRecentlyPinching(true) // Mark that we're pinching
       
       const rect = boardRef.current?.getBoundingClientRect()
       if (rect) {
@@ -327,8 +329,9 @@ export default function Board({
           y: center.y - rect.top,
         })
       }
-    } else if (e.touches.length === 1) {
-      // Single finger pan - check if touching background
+    } else if (e.touches.length === 1 && !wasRecentlyPinching) {
+      // Single finger pan - only allow if we weren't just pinching
+      // Check if touching background
       const target = e.target as HTMLElement
       if (target === boardRef.current || target === contentRef.current || target.tagName === 'svg' || target.tagName === 'rect') {
         setIsPanning(true)
@@ -386,6 +389,7 @@ export default function Board({
     
     if (e.touches.length === 0) {
       setIsPanning(false)
+      setWasRecentlyPinching(false) // Reset the flag when all touches are released
       
       // Apply bounds constraint when gesture ends, using the final zoom value
       if (wasPinching || wasPanning) {
