@@ -62,7 +62,7 @@ export default function Board({ people, allPeople, onUpdatePerson, onDeletePerso
       const personId = pos.id.replace('-minister', '').replace('-recipient', '')
       return peopleIds.has(personId)
     }))
-  }, [people])
+  }, [people, setPositions])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.target === boardRef.current) {
@@ -130,8 +130,8 @@ export default function Board({ people, allPeople, onUpdatePerson, onDeletePerso
               position={pos.position}
               type={pos.type}
               zoom={zoom}
-              onMove={(newPos) => handleCardMove(pos.id, newPos)}
-              onUpdate={(updates) => onUpdatePerson(person.id, updates)}
+              onMove={(newPos: Position) => handleCardMove(pos.id, newPos)}
+              onUpdate={(updates: Partial<Person>) => onUpdatePerson(person.id, updates)}
               onDelete={() => onDeletePerson(person.id)}
             />
           )
