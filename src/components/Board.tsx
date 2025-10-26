@@ -41,6 +41,7 @@ export default function Board({
   const [touchStartZoom, setTouchStartZoom] = useState<number>(1)
   const [touchStartCenter, setTouchStartCenter] = useState<Position | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const isInitializedRef = useRef(false)
 
   // Helper function to update pan and save to parent
@@ -109,7 +110,9 @@ export default function Board({
   }, [allPeople])
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target === boardRef.current) {
+    const target = e.target as HTMLElement
+    // Allow panning on the board container or the content area (but not on cards)
+    if (target === boardRef.current || target === contentRef.current || target.tagName === 'svg' || target.tagName === 'rect') {
       setIsPanning(true)
       setStartPan({ x: e.clientX - pan.x, y: e.clientY - pan.y })
     }
@@ -188,10 +191,13 @@ export default function Board({
           y: center.y - rect.top,
         })
       }
-    } else if (e.touches.length === 1 && e.target === boardRef.current) {
-      // Single finger pan
-      setIsPanning(true)
-      setStartPan({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y })
+    } else if (e.touches.length === 1) {
+      // Single finger pan - check if touching background
+      const target = e.target as HTMLElement
+      if (target === boardRef.current || target === contentRef.current || target.tagName === 'svg' || target.tagName === 'rect') {
+        setIsPanning(true)
+        setStartPan({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y })
+      }
     }
   }
 
@@ -255,8 +261,9 @@ export default function Board({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-    >
+      >
       <div
+        ref={contentRef}
         className="absolute inset-0"
         style={{
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
