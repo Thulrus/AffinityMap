@@ -43,6 +43,7 @@ export default function Board({
   const [touchStartZoom, setTouchStartZoom] = useState<number>(1)
   const [touchStartCenter, setTouchStartCenter] = useState<Position | null>(null)
   const [touchStartPan, setTouchStartPan] = useState<Position | null>(null)
+  const [currentGestureZoom, setCurrentGestureZoom] = useState<number | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const isInitializedRef = useRef(false)
@@ -100,7 +101,7 @@ export default function Board({
   }, [zoom])  // Only recreate when zoom changes, not when positions change
 
   // Constrain pan to prevent panning beyond bounds (clamp, don't snap)
-  const constrainPan = (newPan: Position): Position => {
+  const constrainPan = (newPan: Position, currentZoom: number = zoom): Position => {
     const bounds = getCardBounds()
     if (!bounds || !boardRef.current) return newPan
     
@@ -111,14 +112,14 @@ export default function Board({
     
     // Calculate the pan limits (in screen coordinates)
     // When pan.x is at maxPanX, the left edge of cards is at the right edge of screen minus margin
-    const maxPanX = rect.width - bounds.minX * zoom - margin
+    const maxPanX = rect.width - bounds.minX * currentZoom - margin
     // When pan.x is at minPanX, the right edge of cards is at the left edge of screen plus margin
-    const minPanX = -bounds.maxX * zoom + margin
+    const minPanX = -bounds.maxX * currentZoom + margin
     
     // When pan.y is at maxPanY, the top edge of cards is at the bottom edge of screen minus margin
-    const maxPanY = rect.height - bounds.minY * zoom - margin
+    const maxPanY = rect.height - bounds.minY * currentZoom - margin
     // When pan.y is at minPanY, the bottom edge of cards is at the top edge of screen plus margin
-    const minPanY = -bounds.maxY * zoom + margin
+    const minPanY = -bounds.maxY * currentZoom + margin
     
     // Clamp the pan to stay within these limits
     const constrainedX = Math.max(minPanX, Math.min(maxPanX, newPan.x))
@@ -361,6 +362,7 @@ export default function Board({
         const newPanY = currentCenterY - (worldY * newZoom)
         
         onZoomChange(newZoom)
+        setCurrentGestureZoom(newZoom) // Store zoom for bounds calculation at gesture end
         updatePan({ x: newPanX, y: newPanY }, false) // Don't apply bounds during gesture
       }
     } else if (e.touches.length === 1 && isPanning) {
@@ -373,20 +375,22 @@ export default function Board({
   const handleTouchEnd = (e: React.TouchEvent) => {
     const wasPinching = touchStartDistance !== null
     const wasPanning = isPanning
+    const finalZoom = currentGestureZoom !== null ? currentGestureZoom : zoom
     
     if (e.touches.length < 2) {
       setTouchStartDistance(null)
       setTouchStartCenter(null)
       setTouchStartPan(null)
+      setCurrentGestureZoom(null)
     }
     
     if (e.touches.length === 0) {
       setIsPanning(false)
       
-      // Apply bounds constraint when gesture ends
+      // Apply bounds constraint when gesture ends, using the final zoom value
       if (wasPinching || wasPanning) {
         setPan(currentPan => {
-          const constrained = constrainPan(currentPan)
+          const constrained = constrainPan(currentPan, finalZoom)
           onPanChange(constrained)
           return constrained
         })
