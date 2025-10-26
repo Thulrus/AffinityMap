@@ -50,6 +50,27 @@ export default function Board({
     onPanChange(newPan)
   }
 
+  // Prevent default browser gestures on touch devices
+  useEffect(() => {
+    const board = boardRef.current
+    if (!board) return
+
+    const preventGestures = (e: TouchEvent) => {
+      // Prevent browser pinch-zoom and other default touch behaviors
+      if (e.touches.length > 1) {
+        e.preventDefault()
+      }
+    }
+
+    board.addEventListener('touchstart', preventGestures, { passive: false })
+    board.addEventListener('touchmove', preventGestures, { passive: false })
+
+    return () => {
+      board.removeEventListener('touchstart', preventGestures)
+      board.removeEventListener('touchmove', preventGestures)
+    }
+  }, [])
+
   // Initialize positions from imported data on first render
   useEffect(() => {
     if (!isInitializedRef.current && initialPositions.length > 0) {
@@ -178,6 +199,9 @@ export default function Board({
   // Handle touch start
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
+      // Prevent default browser pinch-zoom
+      e.preventDefault()
+      
       // Pinch to zoom
       const distance = getTouchDistance(e.touches)
       setTouchStartDistance(distance)
@@ -253,6 +277,7 @@ export default function Board({
     <div
       ref={boardRef}
       className="flex-1 relative overflow-hidden cursor-move bg-gray-800"
+      style={{ touchAction: 'none' }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

@@ -36,6 +36,17 @@ export default function PersonCard({
     })
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation()
+    if (e.touches.length === 1) {
+      setIsDragging(true)
+      setDragStart({
+        x: e.touches[0].clientX / zoom - position.x,
+        y: e.touches[0].clientY / zoom - position.y,
+      })
+    }
+  }
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
@@ -46,18 +57,36 @@ export default function PersonCard({
       }
     }
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging && e.touches.length === 1) {
+        e.preventDefault() // Prevent scrolling while dragging
+        onMove({
+          x: e.touches[0].clientX / zoom - dragStart.x,
+          y: e.touches[0].clientY / zoom - dragStart.y,
+        })
+      }
+    }
+
     const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    const handleTouchEnd = () => {
       setIsDragging(false)
     }
 
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      document.addEventListener('touchend', handleTouchEnd)
     }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
     }
   }, [isDragging, dragStart, onMove, zoom])
 
@@ -90,8 +119,10 @@ export default function PersonCard({
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
+        touchAction: 'none',
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
