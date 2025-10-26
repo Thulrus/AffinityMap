@@ -64,6 +64,17 @@ src/
 - Follow existing naming conventions
 - ESLint configuration is in `.eslintrc.cjs`
 
+### Touch Device Support
+
+**IMPORTANT**: Touch device support is a priority for this project. When implementing features:
+- Always consider both mouse and touch interactions
+- Test gestures: tap, drag, pinch-to-zoom, two-finger pan
+- Ensure touch targets are appropriately sized (minimum 44x44px)
+- Provide visual feedback for touch interactions
+- Use touch events (`touchstart`, `touchmove`, `touchend`) alongside mouse events
+- Consider pointer events API for unified mouse/touch/pen handling
+- Test on actual touch devices when possible
+
 ### Common Tasks
 
 **Adding a new feature:**

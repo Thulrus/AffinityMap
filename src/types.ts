@@ -20,3 +20,16 @@ export interface PersonCard {
   position: Position;
   type: 'minister' | 'recipient';
 }
+
+export interface CardPosition {
+  id: string;
+  position: Position;
+  type: 'minister' | 'recipient';
+}
+
+export interface ExportData {
+  version: string;
+  people: Person[];
+  positions: CardPosition[];
+  exportDate: string;
+}

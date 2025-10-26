@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { ExportData } from '../types'
 
 interface ToolbarProps {
   onAddPerson: (name: string) => void
+  onAddMultiplePeople: (names: string[]) => void
+  onExportData: () => void
+  onImportData: (data: ExportData) => void
   allTags: string[]
   selectedTags: string[]
   onToggleTag: (tag: string) => void
@@ -11,6 +15,9 @@ interface ToolbarProps {
 
 export default function Toolbar({
   onAddPerson,
+  onAddMultiplePeople,
+  onExportData,
+  onImportData,
   allTags,
   selectedTags,
   onToggleTag,
@@ -19,6 +26,9 @@ export default function Toolbar({
 }: ToolbarProps) {
   const [newPersonName, setNewPersonName] = useState('')
   const [showTagFilter, setShowTagFilter] = useState(false)
+  const [showImportMenu, setShowImportMenu] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const namesInputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,6 +36,45 @@ export default function Toolbar({
       onAddPerson(newPersonName.trim())
       setNewPersonName('')
     }
+  }
+
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target?.result as string) as ExportData
+        onImportData(data)
+        setShowImportMenu(false)
+      } catch (error) {
+        alert('Error importing file. Please check the file format.')
+        console.error(error)
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = '' // Reset input
+  }
+
+  const handleNamesImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string
+        const names = text.split('\n').map(n => n.trim()).filter(n => n.length > 0)
+        onAddMultiplePeople(names)
+        setShowImportMenu(false)
+      } catch (error) {
+        alert('Error importing names.')
+        console.error(error)
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = '' // Reset input
   }
 
   return (
@@ -71,6 +120,58 @@ export default function Toolbar({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Import/Export */}
+      <div className="relative">
+        <button
+          onClick={() => setShowImportMenu(!showImportMenu)}
+          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded font-medium transition-colors"
+        >
+          Import/Export
+        </button>
+        
+        {showImportMenu && (
+          <div className="absolute top-full mt-2 left-0 bg-gray-700 border border-gray-600 rounded shadow-lg p-3 min-w-[200px] z-10">
+            <button
+              onClick={() => namesInputRef.current?.click()}
+              className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors"
+            >
+              Import Names (TXT)
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors"
+            >
+              Import Project
+            </button>
+            <button
+              onClick={() => {
+                onExportData()
+                setShowImportMenu(false)
+              }}
+              className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors"
+            >
+              Export Project
+            </button>
+          </div>
+        )}
+        
+        {/* Hidden file inputs */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileImport}
+          className="hidden"
+        />
+        <input
+          ref={namesInputRef}
+          type="file"
+          accept=".txt"
+          onChange={handleNamesImport}
+          className="hidden"
+        />
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
