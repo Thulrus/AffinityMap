@@ -6,6 +6,7 @@ interface ToolbarProps {
   onAddMultiplePeople: (names: string[]) => void
   onExportData: () => void
   onImportData: (data: ExportData) => void
+  onLoadExampleData: () => void
   onClearAllData: () => void
   allTags: string[]
   selectedTags: string[]
@@ -19,6 +20,7 @@ export default function Toolbar({
   onAddMultiplePeople,
   onExportData,
   onImportData,
+  onLoadExampleData,
   onClearAllData,
   allTags,
   selectedTags,
@@ -135,6 +137,16 @@ export default function Toolbar({
         
         {showImportMenu && (
           <div className="absolute top-full mt-2 left-0 bg-gray-700 border border-gray-600 rounded shadow-lg p-3 min-w-[200px] z-10">
+            <button
+              onClick={() => {
+                onLoadExampleData()
+                setShowImportMenu(false)
+              }}
+              className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors text-blue-400 hover:text-blue-300"
+            >
+              Load Example Data
+            </button>
+            <hr className="my-2 border-gray-600" />
             <button
               onClick={() => namesInputRef.current?.click()}
               className="w-full text-left px-3 py-2 hover:bg-gray-600 rounded transition-colors"

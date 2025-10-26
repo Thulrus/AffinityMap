@@ -134,6 +134,18 @@ function App() {
     }
   }
 
+  const handleLoadExampleData = async () => {
+    try {
+      const response = await fetch('/AffinityMap/example-data.json')
+      if (!response.ok) throw new Error('Failed to load example data')
+      const data: ExportData = await response.json()
+      handleImportData(data)
+    } catch (error) {
+      alert('Error loading example data. Please try again.')
+      console.error(error)
+    }
+  }
+
   // Get all unique tags from all people
   const allTags = Array.from(new Set(people.flatMap(p => p.tags)))
 
@@ -149,6 +161,7 @@ function App() {
         onAddMultiplePeople={handleAddMultiplePeople}
         onExportData={handleExportData}
         onImportData={handleImportData}
+        onLoadExampleData={handleLoadExampleData}
         onClearAllData={handleClearAllData}
         allTags={allTags}
         selectedTags={selectedTags}

@@ -1,0 +1,308 @@
+{
+  "version": "1.0",
+  "people": [
+    {
+      "id": "example-001",
+      "name": "James Anderson",
+      "tags": ["young family", "works from home"]
+    },
+    {
+      "id": "example-002",
+      "name": "Sarah Martinez",
+      "tags": ["single", "new member"]
+    },
+    {
+      "id": "example-003",
+      "name": "Michael Chen",
+      "tags": ["retired", "needs support"]
+    },
+    {
+      "id": "example-004",
+      "name": "Emily Johnson",
+      "tags": ["young family", "busy schedule"]
+    },
+    {
+      "id": "example-005",
+      "name": "David Thompson",
+      "tags": ["young couple", "expecting"]
+    },
+    {
+      "id": "example-006",
+      "name": "Rachel Williams",
+      "tags": ["single parent", "works from home"]
+    },
+    {
+      "id": "example-007",
+      "name": "Robert Garcia",
+      "tags": ["empty nester", "active"]
+    },
+    {
+      "id": "example-008",
+      "name": "Jennifer Lee",
+      "tags": ["young couple", "new member"]
+    },
+    {
+      "id": "example-009",
+      "name": "Christopher Davis",
+      "tags": ["young family", "leadership"]
+    },
+    {
+      "id": "example-010",
+      "name": "Amanda Rodriguez",
+      "tags": ["retired", "widow"]
+    },
+    {
+      "id": "example-011",
+      "name": "Matthew Wilson",
+      "tags": ["single", "student"]
+    },
+    {
+      "id": "example-012",
+      "name": "Jessica Brown",
+      "tags": ["young family", "works from home"]
+    },
+    {
+      "id": "example-013",
+      "name": "Daniel Taylor",
+      "tags": ["empty nester", "leadership"]
+    },
+    {
+      "id": "example-014",
+      "name": "Michelle Moore",
+      "tags": ["single parent", "busy schedule"]
+    },
+    {
+      "id": "example-015",
+      "name": "Andrew Jackson",
+      "tags": ["young couple", "active"]
+    },
+    {
+      "id": "example-016",
+      "name": "Lisa White",
+      "tags": ["retired", "needs support"]
+    },
+    {
+      "id": "example-017",
+      "name": "Kevin Harris",
+      "tags": ["young family", "leadership"]
+    },
+    {
+      "id": "example-018",
+      "name": "Nicole Martin",
+      "tags": ["single", "new member"]
+    },
+    {
+      "id": "example-019",
+      "name": "Brandon Clark",
+      "tags": ["young couple", "expecting"]
+    },
+    {
+      "id": "example-020",
+      "name": "Stephanie Lewis",
+      "tags": ["empty nester", "active"]
+    }
+  ],
+  "positions": [
+    {
+      "id": "example-001-minister",
+      "position": { "x": 100, "y": 100 },
+      "type": "minister"
+    },
+    {
+      "id": "example-001-recipient",
+      "position": { "x": 700, "y": 100 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-002-minister",
+      "position": { "x": 100, "y": 250 },
+      "type": "minister"
+    },
+    {
+      "id": "example-002-recipient",
+      "position": { "x": 700, "y": 250 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-003-minister",
+      "position": { "x": 100, "y": 400 },
+      "type": "minister"
+    },
+    {
+      "id": "example-003-recipient",
+      "position": { "x": 700, "y": 400 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-004-minister",
+      "position": { "x": 100, "y": 550 },
+      "type": "minister"
+    },
+    {
+      "id": "example-004-recipient",
+      "position": { "x": 700, "y": 550 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-005-minister",
+      "position": { "x": 100, "y": 700 },
+      "type": "minister"
+    },
+    {
+      "id": "example-005-recipient",
+      "position": { "x": 700, "y": 700 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-006-minister",
+      "position": { "x": 100, "y": 850 },
+      "type": "minister"
+    },
+    {
+      "id": "example-006-recipient",
+      "position": { "x": 700, "y": 850 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-007-minister",
+      "position": { "x": 100, "y": 1000 },
+      "type": "minister"
+    },
+    {
+      "id": "example-007-recipient",
+      "position": { "x": 700, "y": 1000 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-008-minister",
+      "position": { "x": 100, "y": 1150 },
+      "type": "minister"
+    },
+    {
+      "id": "example-008-recipient",
+      "position": { "x": 700, "y": 1150 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-009-minister",
+      "position": { "x": 100, "y": 1300 },
+      "type": "minister"
+    },
+    {
+      "id": "example-009-recipient",
+      "position": { "x": 700, "y": 1300 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-010-minister",
+      "position": { "x": 100, "y": 1450 },
+      "type": "minister"
+    },
+    {
+      "id": "example-010-recipient",
+      "position": { "x": 700, "y": 1450 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-011-minister",
+      "position": { "x": 350, "y": 100 },
+      "type": "minister"
+    },
+    {
+      "id": "example-011-recipient",
+      "position": { "x": 950, "y": 100 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-012-minister",
+      "position": { "x": 350, "y": 250 },
+      "type": "minister"
+    },
+    {
+      "id": "example-012-recipient",
+      "position": { "x": 950, "y": 250 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-013-minister",
+      "position": { "x": 350, "y": 400 },
+      "type": "minister"
+    },
+    {
+      "id": "example-013-recipient",
+      "position": { "x": 950, "y": 400 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-014-minister",
+      "position": { "x": 350, "y": 550 },
+      "type": "minister"
+    },
+    {
+      "id": "example-014-recipient",
+      "position": { "x": 950, "y": 550 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-015-minister",
+      "position": { "x": 350, "y": 700 },
+      "type": "minister"
+    },
+    {
+      "id": "example-015-recipient",
+      "position": { "x": 950, "y": 700 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-016-minister",
+      "position": { "x": 350, "y": 850 },
+      "type": "minister"
+    },
+    {
+      "id": "example-016-recipient",
+      "position": { "x": 950, "y": 850 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-017-minister",
+      "position": { "x": 350, "y": 1000 },
+      "type": "minister"
+    },
+    {
+      "id": "example-017-recipient",
+      "position": { "x": 950, "y": 1000 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-018-minister",
+      "position": { "x": 350, "y": 1150 },
+      "type": "minister"
+    },
+    {
+      "id": "example-018-recipient",
+      "position": { "x": 950, "y": 1150 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-019-minister",
+      "position": { "x": 350, "y": 1300 },
+      "type": "minister"
+    },
+    {
+      "id": "example-019-recipient",
+      "position": { "x": 950, "y": 1300 },
+      "type": "recipient"
+    },
+    {
+      "id": "example-020-minister",
+      "position": { "x": 350, "y": 1450 },
+      "type": "minister"
+    },
+    {
+      "id": "example-020-recipient",
+      "position": { "x": 950, "y": 1450 },
+      "type": "recipient"
+    }
+  ],
+  "exportDate": "2025-10-26T12:00:00.000Z"
+}
