@@ -268,11 +268,14 @@ export default function Board({
     const delta = -e.deltaY * 0.001
     const newZoom = Math.max(0.25, Math.min(2, zoom + delta))
     
-    // Calculate new pan to keep mouse position fixed, using current pan from state
+    // Calculate world position of mouse cursor at current zoom
     setPan(currentPan => {
-      const scale = newZoom / zoom
-      const newPanX = mouseX - (mouseX - currentPan.x) * scale
-      const newPanY = mouseY - (mouseY - currentPan.y) * scale
+      const worldX = (mouseX - currentPan.x) / zoom
+      const worldY = (mouseY - currentPan.y) / zoom
+      
+      // Calculate new pan to keep that world position under the cursor at new zoom
+      const newPanX = mouseX - worldX * newZoom
+      const newPanY = mouseY - worldY * newZoom
       
       const constrained = constrainPan({ x: newPanX, y: newPanY })
       onPanChange(constrained)
