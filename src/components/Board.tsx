@@ -396,10 +396,12 @@ export default function Board({
     return allPeople.find(p => p.id === personId)
   }
 
+  const boardCursorClass = isPanning ? 'cursor-grabbing' : 'cursor-grab'
+
   return (
     <div
       ref={boardRef}
-      className="flex-1 relative overflow-hidden cursor-move bg-gray-800"
+      className={`flex-1 relative overflow-hidden ${boardCursorClass} bg-gray-800`}
       style={{ touchAction: 'none' }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

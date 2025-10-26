@@ -23,6 +23,7 @@ export default function PersonCard({
   onDelete,
 }: PersonCardProps) {
   const [isDragging, setIsDragging] = useState(false)
+  const [hasDragged, setHasDragged] = useState(false)
   const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 })
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(person.name)
@@ -32,6 +33,7 @@ export default function PersonCard({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsDragging(true)
+    setHasDragged(false)  // Reset drag flag
     // Convert screen coordinates to world coordinates: (screen - pan) / zoom
     const worldX = (e.clientX - pan.x) / zoom
     const worldY = (e.clientY - pan.y) / zoom
@@ -45,6 +47,7 @@ export default function PersonCard({
     e.stopPropagation()
     if (e.touches.length === 1) {
       setIsDragging(true)
+      setHasDragged(false)  // Reset drag flag
       // Convert screen coordinates to world coordinates: (screen - pan) / zoom
       const worldX = (e.touches[0].clientX - pan.x) / zoom
       const worldY = (e.touches[0].clientY - pan.y) / zoom
@@ -58,6 +61,7 @@ export default function PersonCard({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
+        setHasDragged(true)  // Mark that we actually moved
         // Convert screen coordinates to world coordinates: (screen - pan) / zoom
         const worldX = (e.clientX - pan.x) / zoom
         const worldY = (e.clientY - pan.y) / zoom
@@ -71,6 +75,7 @@ export default function PersonCard({
     const handleTouchMove = (e: TouchEvent) => {
       if (isDragging && e.touches.length === 1) {
         e.preventDefault() // Prevent scrolling while dragging
+        setHasDragged(true)  // Mark that we actually moved
         // Convert screen coordinates to world coordinates: (screen - pan) / zoom
         const worldX = (e.touches[0].clientX - pan.x) / zoom
         const worldY = (e.touches[0].clientY - pan.y) / zoom
@@ -125,11 +130,12 @@ export default function PersonCard({
 
   const bgColor = type === 'minister' ? 'bg-blue-600' : 'bg-green-600'
   const borderColor = type === 'minister' ? 'border-blue-400' : 'border-green-400'
+  const cursorClass = isDragging ? 'cursor-grabbing' : 'cursor-grab'
 
   return (
     <div
       ref={cardRef}
-      className={`absolute ${bgColor} ${borderColor} border-2 rounded-lg shadow-lg cursor-move p-4 min-w-[200px] max-w-[250px]`}
+      className={`absolute ${bgColor} ${borderColor} border-2 rounded-lg shadow-lg ${cursorClass} p-4 min-w-[200px] max-w-[250px]`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -156,7 +162,10 @@ export default function PersonCard({
               className="font-bold text-lg cursor-text"
               onClick={(e) => {
                 e.stopPropagation()
-                setIsEditing(true)
+                // Only allow editing if we didn't just drag
+                if (!hasDragged) {
+                  setIsEditing(true)
+                }
               }}
             >
               {person.name}
