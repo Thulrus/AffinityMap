@@ -95,9 +95,9 @@ export default function Board({
       y: rect.height / 2 - centerY * zoom
     }
     
-    updatePan(newPan)
+    updatePanImmediate(newPan)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zoom, positions])
+  }, [zoom])  // Only recreate when zoom changes, not when positions change
 
   // Constrain pan to prevent panning beyond bounds (clamp, don't snap)
   const constrainPan = (newPan: Position): Position => {
