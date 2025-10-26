@@ -6,6 +6,7 @@ interface PersonCardProps {
   position: Position
   type: 'minister' | 'recipient'
   zoom: number
+  pan: Position
   onMove: (position: Position) => void
   onUpdate: (updates: Partial<Person>) => void
   onDelete: () => void
@@ -16,6 +17,7 @@ export default function PersonCard({
   position,
   type,
   zoom,
+  pan,
   onMove,
   onUpdate,
   onDelete,
@@ -30,9 +32,12 @@ export default function PersonCard({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsDragging(true)
+    // Convert screen coordinates to world coordinates: (screen - pan) / zoom
+    const worldX = (e.clientX - pan.x) / zoom
+    const worldY = (e.clientY - pan.y) / zoom
     setDragStart({
-      x: e.clientX / zoom - position.x,
-      y: e.clientY / zoom - position.y,
+      x: worldX - position.x,
+      y: worldY - position.y,
     })
   }
 
@@ -40,9 +45,12 @@ export default function PersonCard({
     e.stopPropagation()
     if (e.touches.length === 1) {
       setIsDragging(true)
+      // Convert screen coordinates to world coordinates: (screen - pan) / zoom
+      const worldX = (e.touches[0].clientX - pan.x) / zoom
+      const worldY = (e.touches[0].clientY - pan.y) / zoom
       setDragStart({
-        x: e.touches[0].clientX / zoom - position.x,
-        y: e.touches[0].clientY / zoom - position.y,
+        x: worldX - position.x,
+        y: worldY - position.y,
       })
     }
   }
@@ -50,9 +58,12 @@ export default function PersonCard({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
+        // Convert screen coordinates to world coordinates: (screen - pan) / zoom
+        const worldX = (e.clientX - pan.x) / zoom
+        const worldY = (e.clientY - pan.y) / zoom
         onMove({
-          x: e.clientX / zoom - dragStart.x,
-          y: e.clientY / zoom - dragStart.y,
+          x: worldX - dragStart.x,
+          y: worldY - dragStart.y,
         })
       }
     }
@@ -60,9 +71,12 @@ export default function PersonCard({
     const handleTouchMove = (e: TouchEvent) => {
       if (isDragging && e.touches.length === 1) {
         e.preventDefault() // Prevent scrolling while dragging
+        // Convert screen coordinates to world coordinates: (screen - pan) / zoom
+        const worldX = (e.touches[0].clientX - pan.x) / zoom
+        const worldY = (e.touches[0].clientY - pan.y) / zoom
         onMove({
-          x: e.touches[0].clientX / zoom - dragStart.x,
-          y: e.touches[0].clientY / zoom - dragStart.y,
+          x: worldX - dragStart.x,
+          y: worldY - dragStart.y,
         })
       }
     }
@@ -88,7 +102,7 @@ export default function PersonCard({
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [isDragging, dragStart, onMove, zoom])
+  }, [isDragging, dragStart, onMove, zoom, pan])
 
   const handleSaveName = () => {
     if (editName.trim() && editName !== person.name) {

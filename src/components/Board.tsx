@@ -234,15 +234,17 @@ export default function Board({
   }
 
   const handleMouseUp = () => {
-    if (isPanning) {
-      // Apply bounds constraint to wherever we ended up
+    const wasPanning = isPanning
+    setIsPanning(false)
+    
+    // Only apply bounds if we were actually panning
+    if (wasPanning) {
       setPan(currentPan => {
         const constrained = constrainPan(currentPan)
         onPanChange(constrained)
         return constrained
       })
     }
-    setIsPanning(false)
   }
 
   const handleCardMove = (id: string, newPosition: Position) => {
@@ -442,6 +444,7 @@ export default function Board({
               position={pos.position}
               type={pos.type}
               zoom={zoom}
+              pan={pan}
               onMove={(newPos: Position) => handleCardMove(pos.id, newPos)}
               onUpdate={(updates: Partial<Person>) => onUpdatePerson(person.id, updates)}
               onDelete={() => onDeletePerson(person.id)}
