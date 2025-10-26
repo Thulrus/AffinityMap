@@ -368,8 +368,8 @@ export default function Board({
         setCurrentGestureZoom(newZoom) // Store zoom for bounds calculation at gesture end
         updatePan({ x: newPanX, y: newPanY }, false) // Don't apply bounds during gesture
       }
-    } else if (e.touches.length === 1 && isPanning) {
-      // Single finger pan - don't apply bounds during gesture
+    } else if (e.touches.length === 1 && isPanning && !wasRecentlyPinching) {
+      // Single finger pan - only allow if we weren't just pinching and isPanning is true
       updatePan({ x: e.touches[0].clientX - startPan.x, y: e.touches[0].clientY - startPan.y }, false)
     }
   }
@@ -381,10 +381,16 @@ export default function Board({
     const finalZoom = currentGestureZoom !== null ? currentGestureZoom : zoom
     
     if (e.touches.length < 2) {
+      // Ending a pinch or going from 2+ fingers to 1
       setTouchStartDistance(null)
       setTouchStartCenter(null)
       setTouchStartPan(null)
       setCurrentGestureZoom(null)
+      
+      // If we were pinching and now have 1 finger left, don't let it turn into a pan
+      if (wasPinching && e.touches.length === 1) {
+        setIsPanning(false)
+      }
     }
     
     if (e.touches.length === 0) {
