@@ -2,6 +2,8 @@
 
 A visual web application for managing ministering assignments with an intuitive drag-and-drop interface.
 
+A version is running on GitHub Pages, that you can use [here](https://thulrus.github.io/AffinityMap/)
+
 ## Overview
 
 AffinityMap helps organize people into ministering assignments using a visual canvas where names can be dragged around, grouped, and connected. The interface allows you to:
